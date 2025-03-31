@@ -10,8 +10,8 @@ setup(
     long_description_content_type="text/markdown",
     author="Laszlo Popovics",
     author_email="laszlo@aivantguard.com",
-    url="https://scm.aivantguard.com/aivantguard/aioneguardchain",
-    packages=find_namespace_packages(include=["aioneguard.*"]),
+    url="https://github.com/AIvantGuard-AG/aivantguard-common",
+    packages=find_namespace_packages(include=["aivantguard-common.*"]),
     classifiers=[
         "Programming Language :: Python :: 3", "License :: MIT", "Operating System :: OS Independent",
     ],

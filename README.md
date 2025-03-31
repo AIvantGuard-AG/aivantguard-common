@@ -1,5 +1,10 @@
 # AIvantGuard common library for common functions
 
+The code requires a PQC prerequisite from:
+https://github.com/open-quantum-safe/liboqs-python
+
+Install using the given instructions.
+
 # Module: `aivantguard-common/utility/advanced_encrypt.py`
 
 This module provides advanced cryptographic operations combining classical and post-quantum algorithms for enhanced security. It includes functionalities for hybrid key exchange (ECDH + Kyber KEM), authenticated encryption (AES-GCM + HMAC-SHA3-512), digital signatures (ECDSA), and password-based key derivation (Argon2id).
