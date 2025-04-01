@@ -1,4 +1,4 @@
-# aivantguard-common/utility/advanced_encrypt.py
+# aivantguard_common/utility/advanced_encrypt.py
 
 import hashlib
 import secrets

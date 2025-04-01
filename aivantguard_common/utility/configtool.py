@@ -1,4 +1,4 @@
-# aivantguard-common/utility/conf_authorization.py
+# aivantguard_common/utility/configtool.py
 import base64
 import inspect
 import json
@@ -7,8 +7,9 @@ import os
 import threading
 from abc import abstractmethod
 from typing import List, Any
-from . import advanced_encrypt
-from .. abstract.conf_authorization import ConfigurationAuthorization
+from aivantguard_common.utility import advanced_encrypt
+from aivantguard_common.abstract.conf_authorization import ConfigurationAuthorization
+
 
 logger = logging.getLogger(__name__)
 
