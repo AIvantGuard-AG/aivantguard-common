@@ -131,7 +131,7 @@ def setup_logger(name="app_logger", level=None):
 # in the main application entry point.
 logger = setup_logger()
 
-# --- Example Usage (Optional - can be removed) ---
+# --- Example Usage (Optional) ---
 # To demonstrate how to use the logger in other modules:
 #
 # import logging
