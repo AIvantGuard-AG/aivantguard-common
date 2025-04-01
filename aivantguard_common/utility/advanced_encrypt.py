@@ -393,3 +393,14 @@ if __name__ == "__main__":
             alice_kem.kem_instance.free()
         if 'bob_kem' in locals() and bob_kem:
             bob_kem.kem_instance.free()
+
+    print("#" * 80)
+    print("Testing password encryption")
+    _to_encrypt = b"The secret message."
+    _salt = generate_salt(64)
+    _password = "TheReallySecretPassword"
+    _aeskey = derive_key_from_password(_password, _salt, key_length=DERIVED_KEY_BYTES)
+    _cipher = aes_gcm_hmac_encrypt(_aeskey, _to_encrypt)
+    print("Cipher text:", _cipher)
+    _decripted_cipher = aes_gcm_hmac_decrypt(_aeskey, _cipher)
+    print("Decrypted text:", _decripted_cipher.decode())

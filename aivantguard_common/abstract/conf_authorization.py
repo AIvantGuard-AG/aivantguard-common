@@ -1,14 +1,8 @@
 # aivantguard-common/abstract/conf_authorization.py
-from dataclasses import dataclass
-from typing import Union, List
+import logging
+from typing import List
 
-
-@dataclass(frozen=True)
-class AuthorizationOperation:
-    C: "C"     # Create
-    R: "R"     # Read
-    U: "U"     # Update
-    D: "D"     # Delete
+logger = logging.getLogger(__name__)
 
 
 class AuthorizationException(Exception):
@@ -20,52 +14,44 @@ class ConfigurationAuthorization:
     def __init__(self, authorization_template: dict):
         self._authorization = authorization_template
 
-    def check_authorization(self, caller: Union[str, List[str]], operation: str) -> bool:
-        # Convert single string caller to list for consistent handling
-        if isinstance(caller, str):
-            caller = [caller]
-
+    def check_authorization(self, caller: str,  keys: List[str], operation: str) -> bool:
         # Validate operation is one of CRUD
-        valid_operations = {AuthorizationOperation.C,
-                            AuthorizationOperation.R,
-                            AuthorizationOperation.U,
-                            AuthorizationOperation.D}
+        valid_operations = ["C", "R", "U", "D"]
         if operation not in valid_operations:
+            logger.warning(f"Invalid operation {operation}")
             return False
-
-        # Check if caller exists in authorization template
-        if isinstance(caller, list) and len(caller) > 0:
-            caller_key = caller[0]
-        else:
+        if caller not in self._authorization.keys():
+            logger.warning(f"{caller} doesn't exist in authorization template!")
             return False
-
-        if caller_key not in self._authorization:
-            return False
-
-        # Get authorization rules for this caller
-        auth_rules = self._authorization[caller_key]
-
+        auth_rules = self._authorization[caller]
+        logger.debug("auth_rules", auth_rules)
         # Check each rule
+        best_match_auth = None
+        best_match_depth = 0
+        # Iterate through each authorization rules
         for rule in auth_rules:
-            rule_object = rule["object"]
-            auth_string = rule["authorization"]
-
-            # Convert wildcard or single string to list for consistent handling
-            if rule_object == "*":
-                return operation in auth_string
-            elif isinstance(rule_object, str):
-                rule_object = [rule_object]
-
-            # Check if the caller path matches or is a subpath of rule_object
-            if len(rule_object) <= len(caller):
-                matches = True
-                for i, segment in enumerate(rule_object):
-                    if segment != caller[i]:
-                        matches = False
-                        break
-                if matches:
-                    return operation in auth_string
-        return False
+            rule_objects = rule["object"]
+            authorization = rule["authorization"]
+            # Check if the check_key matches or is a subset of the rule's object path
+            match_depth = 0
+            is_match = True
+            # Compare each level of the paths
+            for i, key in enumerate(keys):
+                if i >= len(rule_objects) or rule_objects[i] != key:
+                    is_match = False
+                    break
+                match_depth = i + 1
+            # If we found a match and it's deeper than previous matches
+            if is_match and match_depth > best_match_depth:
+                best_match_auth = authorization
+                best_match_depth = match_depth
+            # If no exact match but the rule is a parent path
+            elif (len(keys) > len(rule_objects) and
+                  all(keys[i] == rule_objects[i] for i in range(len(rule_objects)))):
+                if len(rule_objects) > best_match_depth:
+                    best_match_auth = authorization
+                    best_match_depth = len(rule_objects)
+        return operation in best_match_auth
 
 # --- Example Usage (Optional) ---
 # To demonstrate how the authorization setup:
@@ -77,7 +63,7 @@ class ConfigurationAuthorization:
 #       ],
 #       "com.example.clienttool": [
 #           {"object": ["client", "tool"], "authorization": "CRUD"},
-#           {"object": ["client"], "authorization", "R"}
+#           {"object": ["client"], "authorization": "R"}
 #       ]
 #   }
 #

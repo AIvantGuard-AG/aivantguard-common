@@ -11,7 +11,7 @@ setup(
     author="Laszlo Popovics",
     author_email="laszlo@aivantguard.com",
     url="https://github.com/AIvantGuard-AG/aivantguard-common",
-    packages=find_namespace_packages(include=["aivantguard-common.*"]),
+    packages=find_namespace_packages(include=["aivantguard_common.*"]),
     classifiers=[
         "Programming Language :: Python :: 3", "License :: MIT", "Operating System :: OS Independent",
     ],
